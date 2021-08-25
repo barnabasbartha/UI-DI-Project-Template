@@ -1,14 +1,14 @@
 import * as path from 'path';
-import OptimizeCssAssetsPlugin from 'optimize-css-assets-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import HtmlWebPackPlugin from 'html-webpack-plugin';
 import {CleanWebpackPlugin} from 'clean-webpack-plugin';
-import * as webpack from 'webpack';
-import {Configuration, HotModuleReplacementPlugin} from 'webpack';
-import CopyWebpackPlugin from 'copy-webpack-plugin';
+// @ts-ignore
+import {Configuration, HotModuleReplacementPlugin, Plugin} from 'webpack';
 // @ts-ignore
 import ReplaceInFileWebpackPlugin from 'replace-in-file-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
+// @ts-ignore
+import {Tapable} from "tapable";
 
 interface Target {
    readonly entry: string;
@@ -76,7 +76,7 @@ module.exports = (env: string, argv: { [key: string]: string }): Configuration =
                ],
             },
          ]),
-         new CopyWebpackPlugin({patterns: [{from: target.assetDir, to: target.distAssetDir}]}),
+         // new CopyWebpackPlugin({patterns: [{from: target.assetDir, to: target.distAssetDir}]}),
       );
    } else {
       plugins.push(new HotModuleReplacementPlugin());
@@ -95,13 +95,7 @@ module.exports = (env: string, argv: { [key: string]: string }): Configuration =
    /*
     * Minimizers
     */
-   const minimizers: unknown[] = [
-      new OptimizeCssAssetsPlugin({
-         cssProcessorPluginOptions: {
-            preset: ['default', {discardComments: {removeAll: true}}],
-         },
-      }),
-   ];
+   const minimizers: unknown[] = [];
 
    if (isProd() && target.target === 'web') {
       minimizers.push(
@@ -121,7 +115,6 @@ module.exports = (env: string, argv: { [key: string]: string }): Configuration =
 
    return {
       entry: path.resolve(__dirname, target.entry),
-      watch: !isProd(),
       output: {
          path: path.resolve(__dirname, target.distDir),
          filename: target.output,
@@ -212,8 +205,8 @@ module.exports = (env: string, argv: { [key: string]: string }): Configuration =
       },
       optimization: {
          minimize: isProd(),
-         minimizer: minimizers as webpack.Plugin[],
+         minimizer: minimizers as Array<Plugin | Tapable.Plugin>,
       },
-      plugins: plugins as webpack.Plugin[],
+      plugins: plugins as Array<Plugin | Tapable.Plugin>,
    };
 };
