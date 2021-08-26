@@ -8,7 +8,7 @@ import {Configuration, HotModuleReplacementPlugin, Plugin} from 'webpack';
 import ReplaceInFileWebpackPlugin from 'replace-in-file-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 // @ts-ignore
-import {Tapable} from "tapable";
+import {Tapable} from 'tapable';
 
 interface Target {
    readonly entry: string;
